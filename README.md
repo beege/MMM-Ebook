@@ -1,3 +1,5 @@
+Update 8/13/2020: It's been a long time. I forgot this thing existed. I see there are a few people that have forked it. Would recommend you check out those as they are more up to date and/or support modern things like Python 3.
+
 MMM-Ebook
 =========
 
