@@ -1,11 +1,13 @@
-#!/usr/bin/env python2
+#!/usr/bin/env python3
 import os
 import re
 import sys
 from lxml import etree as ET
 import urllib
+from urllib.request import urlopen
 import glob
 import shutil
+from pathlib import Path
 
 # Cached data (RSS feed XML)
 CACHED_DATA = os.path.join(os.path.dirname(__file__), ".cached")
@@ -29,8 +31,10 @@ class RSSParser(object):
         self.url = url # Confusing design - URL doubles as an actual URL or a cached local file
         self.pageNo = pageNo
               
-        print("Trying to open and parse RSS feed @ <" + self.url + ">...")
-        self.root = ET.parse(self.url).getroot()
+        url = "file://" + self.url if Path(self.url).exists() else self.url
+        print("Trying to open and parse RSS feed @ <" + url + ">...")
+        doc = ET.parse(urlopen(url))
+        self.root = doc.getroot()
 
         # Cache the page        
         if self.pageNo is not None:
@@ -86,11 +90,12 @@ def getLatestRssDataFromMMM():
     
     while True:
         try:
+            print(MMM_RSS_URL)
             parser = RSSParser(MMM_RSS_URL % (pageNo), pageNo)            
             parsers.append(parser)
             pageNo += 1
-        except IOError:
-            print("Failed to open last (end of detected RSS pages)")
+        except IOError as e:
+            print(f'Failed to open last (end of detected RSS pages), error: {e}')
             break
             
     return parsers
@@ -164,15 +169,16 @@ def rewritePostLinks(posts, postsInOrder):
             
     for url in postsInOrder:
         post = posts[url]
+        text = post.text if isinstance(post.text, str) else post.text.decode('utf-8')
 
         for url2 in postsInOrder:
             regex = re.compile('<a\\s(.*href=")%s(".*)>(.*)</a>' % url2)
-            post.text = regex.sub('<a \\1' + posts[url2].localUrl + '\\2>\\3</a>', post.text)
+            post.text = regex.sub('<a \\1' + posts[url2].localUrl + '\\2>\\3</a>', text)
             
 def rewriteImageLinks(posts):
     for post in posts.iteritems():
         for image in bs4.soup(post.text).findAll("img"):
-            print "Image: %(src)s" % image
+            print("Image: %(src)s" % image)
             image_url = urlparse.urljoin(url, image['src'])
             filename = image["src"].split("/")[-1]
             outpath = os.path.join(out_folder, filename)
@@ -186,7 +192,7 @@ def createBookData(posts, postsInOrder):
         shutil.rmtree(BOOK_DATA)
     os.mkdir(BOOK_DATA)
     
-    index = open(os.path.join(BOOK_DATA, 'index.html'), 'wb')
+    index = open(os.path.join(BOOK_DATA, 'index.html'), 'w')
     
     index.write('''<html>
    <body>
@@ -194,14 +200,15 @@ def createBookData(posts, postsInOrder):
      <p style="text-indent:0pt">''')
     for url in postsInOrder:
         post = posts[url]
+        text = post.text if isinstance(post.text, str) else post.text.decode('utf-8')
         
-        open(os.path.join(BOOK_DATA, post.localUrl), 'wb').write(
-            '<title>' + post.title + "</title>\n" + \
-            '<h1>' + post.title + "</h1>\n" \
-            '<h2>By ' + post.author + "</h2>\n" \
-            '<h2> ' + post.date + "</h2>\n" \
-            + post.text)
-        index.write('<a href=%s>%s</a><br/>\n' % (post.localUrl, post.title))
+        open(os.path.join(BOOK_DATA, post.localUrl), 'w').write(
+            '<title>' + post.title.decode('utf-8') + "</title>\n" + \
+            '<h1 class="chapter">' + post.title.decode('utf-8') + "</h1>\n" + \
+            '<h2>By ' + post.author.decode('utf-8') + "</h2>\n" + \
+            '<h2> ' + post.date.decode('utf-8') + "</h2>\n" + \
+            text)
+        index.write('<a href=%s>%s</a><br/>\n' % (post.localUrl, post.title.decode('utf-8')))
         
     index.write('''     </p>
    </body>
@@ -215,4 +222,3 @@ def main():
             
 if __name__=="__main__":
     main()
-    
