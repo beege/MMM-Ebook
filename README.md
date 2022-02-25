@@ -6,11 +6,7 @@ The bundled ebooks are current as of February 2022.
 
 ### Use
 
-This project depends on:
-
-- **lxml**. You can install this through pip, (on Mac) Homebrew, or possibly your OS's package manager.
-
-After lxml is installed, run **dump.py** in the repo root, and then import the file ```import_index.html_in_this_folder_in_calibre_to_create_ebook/index.html``` into Calibre where you can convert it to an ePub, mobi, or other format of your choice. Note: You will want to set Calibre to import HTML files in depth-first order by going to Preferences → Advanced → Plugins → File type → HTML to ZIP and checking **Add linked files in breadth first order**.
+In the repo root, run ```pip install -r requirements.txt" to install dependencies```. After deps are installed, run **dump.py** in the repo root, and then import the file ```import_index.html_in_this_folder_in_calibre_to_create_ebook/index.html``` into Calibre where you can convert it to an ePub, mobi, or other format of your choice. Note: You will want to set Calibre to import HTML files in depth-first order by going to Preferences → Advanced → Plugins → File type → HTML to ZIP and checking **Add linked files in breadth first order**.
 
 ### MMM Approved!
 
@@ -20,4 +16,4 @@ You can see Mr Money Mustache's endorsement of this project [here](https://forum
 
 ### Future Updates
 
-When I get a chance I plan to add a requirements.txt file to make dependency install easy and automatic ebook generation through the calibre command-line tools.
+When I get a chance I plan to add automatic ebook generation through the calibre command-line tools.
