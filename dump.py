@@ -194,20 +194,32 @@ def createBookData(posts, postsInOrder):
     
     index = open(os.path.join(BOOK_DATA, 'index.html'), 'w')
     
-    index.write('''<html>
-   <body>
-     <h1>Table of Contents</h1>
-     <p style="text-indent:0pt">''')
+    index.write('''<!DOCTYPE html>
+    <html lang="en">
+    <head>
+        <meta charset="UTF-8">
+    </head>
+    <body>
+      <h1>Table of Contents</h1>
+      <p style="text-indent:0pt">''')
     for url in postsInOrder:
         post = posts[url]
         text = post.text if isinstance(post.text, str) else post.text.decode('utf-8')
         
         open(os.path.join(BOOK_DATA, post.localUrl), 'w').write(
-            '<title>' + post.title.decode('utf-8') + "</title>\n" + \
-            '<h1 class="chapter">' + post.title.decode('utf-8') + "</h1>\n" + \
-            '<h2>By ' + post.author.decode('utf-8') + "</h2>\n" + \
-            '<h2> ' + post.date.decode('utf-8') + "</h2>\n" + \
-            text)
+            '<!DOCTYPE html>\n' + \
+            '<html lang="en">\n' + \
+                '<head>\n' + \
+                    '<meta charset="UTF-8">\n' + \
+                    '<title>' + post.title.decode('utf-8') + "</title>\n" + \
+                '</head>\n' + \
+                '<body>\n' + \
+                    '<h1 class="chapter">' + post.title.decode('utf-8') + "</h1>\n" + \
+                    '<h2>By ' + post.author.decode('utf-8') + "</h2>\n" + \
+                    '<h2> ' + post.date.decode('utf-8') + "</h2>\n" + \
+                    text + \
+                '</body>' + \
+            '</html>')
         index.write('<a href=%s>%s</a><br/>\n' % (post.localUrl, post.title.decode('utf-8')))
         
     index.write('''     </p>
