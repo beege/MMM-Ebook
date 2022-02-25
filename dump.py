@@ -8,6 +8,7 @@ from urllib.request import urlopen
 import glob
 import shutil
 from pathlib import Path
+import subprocess
 
 # Cached data (RSS feed XML)
 CACHED_DATA = os.path.join(os.path.dirname(__file__), ".cached")
@@ -226,11 +227,22 @@ def createBookData(posts, postsInOrder):
    </body>
 </html>''')
 
+def generateEbooks():
+    print("Generating eBooks...")
+
+    subprocess.run(["ebook-convert", "import_index.html_in_this_folder_in_calibre_to_create_ebook/index.html", "Ebooks/mmm.azw3", "--title", "Financial Freedom Through Badassity", "--authors", "Mr. Money Mustache", "--no-inline-toc"])
+    subprocess.run(["ebook-convert", "import_index.html_in_this_folder_in_calibre_to_create_ebook/index.html", "Ebooks/mmm.epub", "--title", "Financial Freedom Through Badassity", "--authors", "Mr. Money Mustache"])
+    subprocess.run(["ebook-convert", "import_index.html_in_this_folder_in_calibre_to_create_ebook/index.html", "Ebooks/mmm.mobi", "--title", "Financial Freedom Through Badassity", "--authors", "Mr. Money Mustache", "--no-inline-toc"])
+    subprocess.run(["ebook-convert", "import_index.html_in_this_folder_in_calibre_to_create_ebook/index.html", "Ebooks/mmm.pdf", "--title", "Financial Freedom Through Badassity", "--authors", "Mr. Money Mustache"])
+
+    print("Finished generating Ebooks")
+
 def main():
     parsers = getRssData()
     (posts, postsInOrder) = createPostingsFromParsedRss(parsers)
     rewritePostLinks(posts, postsInOrder)
     createBookData(posts, postsInOrder)
+    generateEbooks()
             
 if __name__=="__main__":
     main()
