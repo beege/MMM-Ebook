@@ -2,6 +2,7 @@
 import os
 import re
 import sys
+from urllib.parse import urlparse
 from lxml import etree as ET
 import urllib
 from urllib.request import urlopen
@@ -9,9 +10,11 @@ import glob
 import shutil
 from pathlib import Path
 import subprocess
+from PIL import Image, ImageFile
 
 # Cached data (RSS feed XML)
 CACHED_DATA = os.path.join(os.path.dirname(__file__), ".cached")
+CACHED_MEDIA = os.path.join(CACHED_DATA, "media")
 
 CACHED_RSS_PREFIX = "rssPage"
 CACHED_RSS_PAGENO = "%04u"
@@ -21,9 +24,13 @@ CACHED_URL_MAP_PATH = os.path.join(CACHED_DATA, 'url_maps')
 
 MMM_RSS_URL = "http://www.mrmoneymustache.com/feed/?order=ASC&paged=%d"
 
+IMG_MAX_WIDTH_PX = 800
+ImageFile.LOAD_TRUNCATED_IMAGES = True
+
 # Book data (use data here to construct ebook
 BOOK_DATA = os.path.join(os.path.dirname(__file__), 
     "import_index.html_in_this_folder_in_calibre_to_create_ebook")
+MEDIA = os.path.join(BOOK_DATA, "media")
 
 class RSSParser(object):
     """Downloads (or reads from local file cache) RSS data of MMM feed"""
@@ -177,21 +184,56 @@ def rewritePostLinks(posts, postsInOrder):
             post.text = regex.sub('<a \\1' + posts[url2].localUrl + '\\2>\\3</a>', text)
             
 def rewriteImageLinks(posts):
-    for post in posts.iteritems():
-        for image in bs4.soup(post.text).findAll("img"):
-            print("Image: %(src)s" % image)
-            image_url = urlparse.urljoin(url, image['src'])
-            filename = image["src"].split("/")[-1]
-            outpath = os.path.join(out_folder, filename)
-            urlretrieve(image_url, outpath)
+    print("Rewriting image links...")
+
+    if not os.path.isdir(CACHED_MEDIA):
+        os.mkdir(CACHED_MEDIA)
+
+    for post in posts.values():
+        text = post.text if isinstance(post.text, str) else post.text.decode('utf-8')
+        tree = ET.HTML(text)
+
+        for image in tree.findall('.//img'):
+            imageurl = image.attrib["src"]
+            urlParseResult = urlparse(imageurl)
+            path = urlParseResult.path
+            imageFilename = urlParseResult.path.replace("/", "", 1) .replace("/", "_") # Create name from full path to help avoid accidentally overriding images, wordpress image paths have date component
+
+            # Only include images actually hosted on mrmoneymustache.com
+            if urlParseResult.hostname != "www.mrmoneymustache.com":
+                print(f"Not including image in article {post.title} hosted at {imageurl}")
+                continue
+
+            # Cache images
+            cachedImagePath = os.path.join(CACHED_MEDIA, imageFilename)
+            if not Path(cachedImagePath).exists():
+                try:
+                    urllib.request.urlretrieve(imageurl, cachedImagePath)
+
+                    # Resize images to a max width of 800px to save space
+                    try:
+                        image = Image.open(cachedImagePath)
+                        image.LOAD_TRUNCATED_IMAGES = True
+                        if not image.width <= 600:
+                            aspectRatioChange = IMG_MAX_WIDTH_PX / image.width
+                            height = int(image.height * aspectRatioChange)
+                            newSize = (IMG_MAX_WIDTH_PX, height)
+                            image = image.resize(newSize)
+
+                        image.save(cachedImagePath, optimize=True, quality=85)
+                    except IOError as e:
+                        print(f'Failed to open image at path {cachedImagePath} for resize, caching at original resolution, error: {e}')
+                except Exception as e:
+                    print(f"Caching image {imageurl} to {localpath} failed with exception {e}")
+
+            outputImageAbsolutePath = os.path.join(MEDIA, imageFilename)
+            outputImageRelativePath = os.path.relpath(outputImageAbsolutePath, BOOK_DATA)
+            shutil.copyfile(cachedImagePath, outputImageAbsolutePath)
+            text = text.replace(imageurl, outputImageRelativePath)
+        post.text = text
     
-            
 def createBookData(posts, postsInOrder):
     print("Creating book data...")
-
-    if os.path.isdir(BOOK_DATA):
-        shutil.rmtree(BOOK_DATA)
-    os.mkdir(BOOK_DATA)
     
     index = open(os.path.join(BOOK_DATA, 'index.html'), 'w')
     
@@ -238,9 +280,16 @@ def generateEbooks():
     print("Finished generating Ebooks")
 
 def main():
+    if os.path.isdir(BOOK_DATA):
+        shutil.rmtree(BOOK_DATA)
+
+    os.mkdir(BOOK_DATA)
+    os.mkdir(MEDIA)
+
     parsers = getRssData()
     (posts, postsInOrder) = createPostingsFromParsedRss(parsers)
     rewritePostLinks(posts, postsInOrder)
+    rewriteImageLinks(posts)
     createBookData(posts, postsInOrder)
     generateEbooks()
             

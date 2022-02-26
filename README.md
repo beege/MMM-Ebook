@@ -1,4 +1,4 @@
-This is a fork of [beege/MMM-Ebook](https://github.com/beege/MMM-Ebook]) updated to use Python3 and generate ebooks so you do not need to manually generate eboks in Calibre.
+This is a fork of [beege/MMM-Ebook](https://github.com/beege/MMM-Ebook]) updated to use Python3 and generate ebooks so you do not need to manually generate ebooks in Calibre, and to include images hosted at mrmoneymustache.com.
 
 This utility scrapes Mr. Money Mustache's blog (http://www.mrmoneymustache.com/) and outputs HTML pages to import through a tool such as Calibre to create into an EBook of the desired format.
 
@@ -18,7 +18,3 @@ After lxml is installed, run **dump.py** in the repo root. When the script compl
 You can see Mr Money Mustache's endorsement of this project [here](https://forum.mrmoneymustache.com/welcome-to-the-forum/making-a-mr-money-mustache-ebook/).
 
 "Awesome work!! You hereby have my full approval to share this book (and work together to improve it if you like). As long as you give it away for free!"
-
-### Future Updates
-
-When I get a chance I would like to add images to ebooks.
