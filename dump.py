@@ -24,7 +24,7 @@ CACHED_URL_MAP_PATH = os.path.join(CACHED_DATA, 'url_maps')
 
 MMM_RSS_URL = "http://www.mrmoneymustache.com/feed/?order=ASC&paged=%d"
 
-IMG_MAX_WIDTH_PX = 800
+IMG_MAX_WIDTH_PX = 450
 ImageFile.LOAD_TRUNCATED_IMAGES = True
 
 # Book data (use data here to construct ebook
