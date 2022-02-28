@@ -229,6 +229,7 @@ def rewriteImageLinks(posts):
             outputImageAbsolutePath = os.path.join(MEDIA, imageFilename)
             outputImageRelativePath = os.path.relpath(outputImageAbsolutePath, BOOK_DATA)
             shutil.copyfile(cachedImagePath, outputImageAbsolutePath)
+            text = re.sub(r'srcset=".*"', "", text)
             text = text.replace(imageurl, outputImageRelativePath)
         post.text = text
     
