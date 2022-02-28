@@ -251,6 +251,8 @@ def createBookData(posts, postsInOrder):
       <br>
       <h3>Table of Contents</h2>
       <p style="text-indent:0pt">''')
+
+    chapter = 0
     for url in postsInOrder:
         post = posts[url]
         text = post.text if isinstance(post.text, str) else post.text.decode('utf-8')
@@ -269,7 +271,8 @@ def createBookData(posts, postsInOrder):
                     text + \
                 '</body>' + \
             '</html>')
-        index.write('<a href=%s>%s</a><br/>\n' % (post.localUrl, post.title.decode('utf-8')))
+        chapter += 1
+        index.write(f'{chapter}. <a href=%s>%s</a><br/>\n' % (post.localUrl, post.title.decode('utf-8')))
         
     index.write('''     </p>
    </body>
