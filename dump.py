@@ -11,6 +11,7 @@ import shutil
 from pathlib import Path
 import subprocess
 from PIL import Image, ImageFile
+import time
 
 # Cached data (RSS feed XML)
 CACHED_DATA = os.path.join(os.path.dirname(__file__), ".cached")
@@ -238,13 +239,17 @@ def createBookData(posts, postsInOrder):
     
     index = open(os.path.join(BOOK_DATA, 'index.html'), 'w')
     
-    index.write('''<!DOCTYPE html>
+    index.write(f'''<!DOCTYPE html>
     <html lang="en">
     <head>
         <meta charset="UTF-8">
     </head>
     <body>
-      <h1>Table of Contents</h1>
+      <h1>Financial Freedom Through Badassity</h1>
+      <h2>by Mr. Money Mustache</h2>
+      Generated {time.strftime("%B %d, %Y")}
+      <br>
+      <h3>Table of Contents</h2>
       <p style="text-indent:0pt">''')
     for url in postsInOrder:
         post = posts[url]
