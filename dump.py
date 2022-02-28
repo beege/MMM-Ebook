@@ -12,6 +12,7 @@ from pathlib import Path
 import subprocess
 from PIL import Image, ImageFile
 import time
+from datetime import date
 
 # Cached data (RSS feed XML)
 CACHED_DATA = os.path.join(os.path.dirname(__file__), ".cached")
@@ -281,9 +282,9 @@ def createBookData(posts, postsInOrder):
 def generateEbooks():
     print("Generating eBooks...")
 
-    subprocess.run(["ebook-convert", "import_index.html_in_this_folder_in_calibre_to_create_ebook/index.html", "Ebooks/mmm.azw3", "--title", "Financial Freedom Through Badassity", "--authors", "Mr. Money Mustache", "--no-inline-toc"])
-    subprocess.run(["ebook-convert", "import_index.html_in_this_folder_in_calibre_to_create_ebook/index.html", "Ebooks/mmm.epub", "--title", "Financial Freedom Through Badassity", "--authors", "Mr. Money Mustache"])
-    subprocess.run(["ebook-convert", "import_index.html_in_this_folder_in_calibre_to_create_ebook/index.html", "Ebooks/mmm.mobi", "--title", "Financial Freedom Through Badassity", "--authors", "Mr. Money Mustache", "--no-inline-toc"])
+    subprocess.run(["ebook-convert", "import_index.html_in_this_folder_in_calibre_to_create_ebook/index.html", "Ebooks/mmm.azw3", "--title", "Financial Freedom Through Badassity", "--authors", "Mr. Money Mustache", "--pubdate", f"{date.today()}"])
+    subprocess.run(["ebook-convert", "import_index.html_in_this_folder_in_calibre_to_create_ebook/index.html", "Ebooks/mmm.epub", "--title", "Financial Freedom Through Badassity", "--authors", "Mr. Money Mustache", "--pubdate", f"{date.today()}"])
+    subprocess.run(["ebook-convert", "import_index.html_in_this_folder_in_calibre_to_create_ebook/index.html", "Ebooks/mmm.mobi", "--title", "Financial Freedom Through Badassity", "--authors", "Mr. Money Mustache", "--pubdate", f"{date.today()}"])
     subprocess.run(["ebook-convert", "import_index.html_in_this_folder_in_calibre_to_create_ebook/index.html", "Ebooks/mmm.pdf", "--title", "Financial Freedom Through Badassity", "--authors", "Mr. Money Mustache"])
 
     print("Finished generating Ebooks")
