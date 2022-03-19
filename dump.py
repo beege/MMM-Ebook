@@ -26,6 +26,8 @@ CACHED_URL_MAP_PATH = os.path.join(CACHED_DATA, 'url_maps')
 
 MMM_RSS_URL = "http://www.mrmoneymustache.com/feed/?order=ASC&paged=%d"
 
+COVER_PATH = os.path.join(os.path.dirname(__file__), "Cover.png")
+
 IMG_MAX_WIDTH_PX = 450
 ImageFile.LOAD_TRUNCATED_IMAGES = True
 
@@ -238,6 +240,8 @@ def rewriteImageLinks(posts):
 def createBookData(posts, postsInOrder):
     print("Creating book data...")
     
+    shutil.copyfile(COVER_PATH, os.path.join(BOOK_DATA, 'Cover.png'))
+
     index = open(os.path.join(BOOK_DATA, 'index.html'), 'w')
     
     index.write(f'''<!DOCTYPE html>
@@ -282,10 +286,10 @@ def createBookData(posts, postsInOrder):
 def generateEbooks():
     print("Generating eBooks...")
 
-    subprocess.run(["ebook-convert", "import_index.html_in_this_folder_in_calibre_to_create_ebook/index.html", "Ebooks/mmm.azw3", "--title", "Financial Freedom Through Badassity", "--authors", "Mr. Money Mustache", "--pubdate", f"{date.today()}"])
-    subprocess.run(["ebook-convert", "import_index.html_in_this_folder_in_calibre_to_create_ebook/index.html", "Ebooks/mmm.epub", "--title", "Financial Freedom Through Badassity", "--authors", "Mr. Money Mustache", "--pubdate", f"{date.today()}"])
-    subprocess.run(["ebook-convert", "import_index.html_in_this_folder_in_calibre_to_create_ebook/index.html", "Ebooks/mmm.mobi", "--title", "Financial Freedom Through Badassity", "--authors", "Mr. Money Mustache", "--pubdate", f"{date.today()}"])
-    subprocess.run(["ebook-convert", "import_index.html_in_this_folder_in_calibre_to_create_ebook/index.html", "Ebooks/mmm.pdf", "--title", "Financial Freedom Through Badassity", "--authors", "Mr. Money Mustache"])
+    subprocess.run(["ebook-convert", "import_index.html_in_this_folder_in_calibre_to_create_ebook/index.html", "Ebooks/mmm.azw3", "--title", "Financial Freedom Through Badassity", "--authors", "Mr. Money Mustache", "--pubdate", f"{date.today()}", "--cover", "Cover.png"])
+    subprocess.run(["ebook-convert", "import_index.html_in_this_folder_in_calibre_to_create_ebook/index.html", "Ebooks/mmm.epub", "--title", "Financial Freedom Through Badassity", "--authors", "Mr. Money Mustache", "--pubdate", f"{date.today()}", "--cover", "Cover.png"])
+    subprocess.run(["ebook-convert", "import_index.html_in_this_folder_in_calibre_to_create_ebook/index.html", "Ebooks/mmm.mobi", "--title", "Financial Freedom Through Badassity", "--authors", "Mr. Money Mustache", "--pubdate", f"{date.today()}", "--cover", "Cover.png"])
+    subprocess.run(["ebook-convert", "import_index.html_in_this_folder_in_calibre_to_create_ebook/index.html", "Ebooks/mmm.pdf", "--title", "Financial Freedom Through Badassity", "--authors", "Mr. Money Mustache", "--cover", "Cover.png"])
 
     print("Finished generating Ebooks")
 
