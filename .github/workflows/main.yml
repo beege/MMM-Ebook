@@ -1,0 +1,14 @@
+on:
+  workflow_dispatch:
+# on:
+#   schedule:
+#   - cron: "0 0 * * *"[]
+jobs:
+  install-deps:
+    name: Install Dependencies
+    run: pip install -r requirements.txt
+  regenerate-ebooks:
+    name: Regenerate Ebooks
+    needs: [install-deps]
+    steps:
+    run: python generate-ebooks.py
