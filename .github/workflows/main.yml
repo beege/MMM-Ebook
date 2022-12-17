@@ -6,8 +6,10 @@ on:
 jobs:
   install-deps:
     name: Install Dependencies
-    run: pip install -r requirements.txt
+    steps:
+      - run: pip install -r requirements.txt
   regenerate-ebooks:
     name: Regenerate Ebooks
     needs: [install-deps]
-    run: python generate-ebooks.py
+    steps:
+      - run: python generate-ebooks.py
